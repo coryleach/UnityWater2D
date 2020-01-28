@@ -8,6 +8,8 @@
 
 > A simple implementation of 2D springy water in Unity3D.</br>
 
+<a href="https://i.imgur.com/wQbhC0w">Example Video</a>
+
 ## Install
 
 #### Using UnityWater2D (for Unity 2018.3 or later)
@@ -16,7 +18,7 @@ Find the manifest.json file in the Packages folder of your project and edit it t
 ```js
 {
   "dependencies": {
-    "com.gameframe.water2d": "https://github.com/coryleach/UnityServiceProvider.git#1.0.0",
+    "com.gameframe.water2d": "https://github.com/coryleach/UnityWater2D.git#1.0.0",
     ...
   },
 }
