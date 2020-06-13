@@ -1,4 +1,4 @@
-<h1 align="center">Welcome to com.gameframe.water2d 👋</h1>
+<h1 align="center">Gameframe.Water2D 👋</h1>
 
 <!-- BADGE-START -->
 [![Codacy Badge](https://app.codacy.com/project/badge/Grade/2ba0a4bb579d4a96ac91ab77458f7f76)](https://www.codacy.com/manual/coryleach/UnitySaveLoad?utm_source=github.com&amp;utm_medium=referral&amp;utm_content=coryleach/UnitySaveLoad&amp;utm_campaign=Badge_Grade)
@@ -9,7 +9,26 @@
 [![twitter](https://img.shields.io/twitter/follow/coryleach.svg?style=social)](https://twitter.com/coryleach)
 <!-- BADGE-END -->
 
-> A simple implementation of 2D springy water in Unity3D.</br>
+> Splashy 2D water
+
+## Quick Package Install
+
+#### Using UnityPackageManager (for Unity 2019.3 or later)
+Open the package manager window (menu: Window > Package Manager)<br/>
+Select "Add package from git URL...", fill in the pop-up with the following link:<br/>
+https://github.com/coryleach/UnityWater2D.git#1.0.1<br/>
+
+#### Using UnityPackageManager (for Unity 2019.1 or later)
+
+Find the manifest.json file in the Packages folder of your project and edit it to look like this:
+```js
+{
+  "dependencies": {
+    "com.gameframe.water2d": "https://github.com/coryleach/UnityWater2D.git#1.0.1",
+    ...
+  },
+}
+```
 
 <!-- DOC-START -->
 <!-- 
@@ -27,9 +46,10 @@ Changes between 'DOC START' and 'DOC END' will not be modified by readme update 
 * Twitter: [@coryleach](https://twitter.com/coryleach)
 * Github: [@coryleach](https://github.com/coryleach)
 
+
 ## Show your support
 
 Give a ⭐️ if this project helped you!
 
 ***
-_This README was generated with ❤️ by [readme-md-generator](https://github.com/kefranabg/readme-md-generator)_
+_This README was generated with ❤️ by [Gameframe.Packages](https://github.com/coryleach/unitypackages)_
