@@ -50,7 +50,6 @@ namespace Gameframe.Water2D
 		private const float BaseHeight = 0;
 		
 		private int _edgeCount;
-		private int _nodeCount;
 
 		[ContextMenu("Build")]
 		public void Build()
@@ -81,11 +80,11 @@ namespace Gameframe.Water2D
 		private void SpawnWater()
 		{
 			_edgeCount = Mathf.RoundToInt(width) * nodeDensity;
-			_nodeCount = _edgeCount + 1;
+			var nodeCount = _edgeCount + 1;
 
 			var meshWidth = width / _edgeCount;
 
-			_nodes = new Water2DSurfaceNodeData[_nodeCount];
+			_nodes = new Water2DSurfaceNodeData[nodeCount];
 			_meshes = new Water2DMeshData[_edgeCount];
 
 			//Build Nodes
@@ -132,7 +131,7 @@ namespace Gameframe.Water2D
 				uv[2] = new Vector2(0, 0);
 				uv[3] = new Vector3(1, 0);
 
-				var triangles = new int[6] {0, 1, 3, 3, 1, 2};
+				int[] triangles = {0, 1, 3, 3, 1, 2};
 
 				edgeMesh.mesh.vertices = verts;
 				edgeMesh.mesh.uv = uv;
