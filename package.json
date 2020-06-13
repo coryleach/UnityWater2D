@@ -1,12 +1,15 @@
 {
   "name": "com.gameframe.water2d",
   "displayName": "Gameframe.Water2D",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "keywords": [],
   "author": {
     "name": "Cory Leach",
     "email": "cory.leach@gmail.com",
-    "url": "https://github.com/coryleach"
+    "url": "https://github.com/coryleach",
+    "github": "coryleach",
+    "twitter": "coryleach"
   },
-  "description": "Build a 2D mesh that has springs and colliders for splashy 2d water."
+  "description": "> Splashy 2D water",
+  "repositoryName": "UnityWater2D"
 }
