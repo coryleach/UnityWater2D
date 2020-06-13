@@ -1,1 +1,0 @@
-{ "name": "com.gameframe.water2d.Tests", "references": [ "com.gameframe.water2d" ], "optionalUnityReferences": ["TestAssemblies"], "includePlatforms": [], "excludePlatforms": [] }

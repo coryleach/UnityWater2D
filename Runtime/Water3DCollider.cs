@@ -26,30 +26,16 @@ using UnityEngine;
 
 namespace Gameframe.Water2D
 {
-	public class Water3DCollider : MonoBehaviour {
+	public class Water3DCollider : WaterCollider 
+	{
 
-		public Water2D waterBody;
-		public int leftNode;
-		public int rightNode;
-		
-		/*Rigidbody _rigidbody;
-		public Rigidbody rigidbody {
-			get {
-				if ( _rigidbody == null ) {
-					_rigidbody = GetComponent<Rigidbody>();
-				}
-				return _rigidbody;
-			}
-		}//*/
-		
 		void OnTriggerEnter(Collider collider)
 		{
-		
 			var otherRigidbody = collider.GetComponent<Rigidbody>();
 			
-			if ( otherRigidbody != null ) {
-				
-				otherRigidbody.drag = waterBody.waterDrag;
+			if ( otherRigidbody != null ) 
+			{
+				otherRigidbody.drag = waterBody.WaterDrag;
 				
 				float momentum = otherRigidbody.velocity.y * otherRigidbody.mass;
 				float xPos = otherRigidbody.position.x;
@@ -58,31 +44,27 @@ namespace Gameframe.Water2D
 				
 				//Set a new V for this object
 				var v = otherRigidbody.velocity;
-				v.y = momentum / waterBody.nodeMass;
+				v.y = momentum / waterBody.NodeMass;
 				otherRigidbody.velocity = v;
-				
 			}
-			
 		}
 		
-		void OnTriggerStay(Collider collider) {
-			
+		void OnTriggerStay(Collider collider) 
+		{
 			var otherRigidbody = collider.GetComponent<Rigidbody>();
-			
-			if ( otherRigidbody != null ) {
-				otherRigidbody.drag = waterBody.waterDrag;
+			if ( otherRigidbody != null ) 
+			{
+				otherRigidbody.drag = waterBody.WaterDrag;
 			}
-			
 		}
 		
-		void OnTriggerExit(Collider collider) {
-			
+		void OnTriggerExit(Collider collider) 
+		{
 			var otherRigidbody = collider.GetComponent<Rigidbody>();
-			
-			if ( otherRigidbody != null ) {
+			if ( otherRigidbody != null ) 
+			{
 				otherRigidbody.drag = 0f;
 			}
-			
 		}
 		
 	}
