@@ -1,81 +1,55 @@
-﻿/*
-The MIT License (MIT)
-
-Copyright (c) 2014 Cory R. Leach
-
-Permission is hereby granted, free of charge, to any person obtaining a copy
-of this software and associated documentation files (the "Software"), to deal
-in the Software without restriction, including without limitation the rights
-to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
-copies of the Software, and to permit persons to whom the Software is
-furnished to do so, subject to the following conditions:
-
-The above copyright notice and this permission notice shall be included in all
-copies or substantial portions of the Software.
-
-THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
-AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
-LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
-OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
-SOFTWARE.
-*/
-using UnityEngine;
-using System.Collections;
+﻿using UnityEngine;
 
 namespace Gameframe.Water2D
 {
 
 	public class Water2D : MonoBehaviour
 	{
+		[SerializeField, Range(0f, 1f)] private float springConstant = 0.236f;
+		[SerializeField, Range(0f, 1f)] private float damping = 0.878f;
+		[SerializeField, Range(0f, 0.2f)] private float spread = 0.0173f;
 
-		[Range(0f, 1f)] public float springConstant = 0.236f;
-		[Range(0f, 1f)] public float damping = 0.878f;
-		[Range(0f, 0.2f)] public float spread = 0.0173f;
+		[SerializeField] private GameObject splashFx;
+		[SerializeField] private Material material;
 
-		public GameObject splashFx;
-		public Material material;
+		[SerializeField] private int nodeDensity = 1;
 
-		public int nodeDensity = 1;
+		[SerializeField] private float zOffset;
 
-		public float zOffset = 0;
+		[SerializeField] private float width = 10;
+		[SerializeField] private float height = 10;
 
-		public float width = 10;
-		public float height = 10;
+		[SerializeField] private bool useCollider3D;
+		[SerializeField] private float nodeMass = 40;
+		public float NodeMass => nodeMass;
+		
+		[SerializeField] private float waterDrag = 2f;
+		public float WaterDrag => waterDrag;
 
-		public float nodeMass = 40;
-		public float waterDrag = 2f;
+		private Water2DSurfaceNodeData[] _nodes;
+		private Water2DMeshData[] _meshes;
 
-		public bool useCollider3D = false;
-
-		Water2DSurfaceNode[] nodes;
-		Water2DMesh[] meshes;
-
-		// Use this for initialization
-		void Start()
+		private void Start()
 		{
 			Build();
 		}
 
-		void FixedUpdate()
+		private void FixedUpdate()
 		{
 			PropagateWaves();
 			UpdateNodes();
 		}
 
-		void Update()
+		private void Update()
 		{
 			UpdateMeshes();
 		}
 
-		float left = 0f;
-		float top = 0f;
-
-		float baseHight = 0;
-
-		int edgeCount = 0;
-		int nodeCount = 0;
+		private const float Left = 0f;
+		private const float Top = 0f;
+		private const float BaseHeight = 0;
+		
+		private int _edgeCount;
 
 		[ContextMenu("Build")]
 		public void Build()
@@ -84,10 +58,10 @@ namespace Gameframe.Water2D
 			SpawnWater();
 		}
 
-		public void ClearChildren()
+		private void ClearChildren()
 		{
-			int children = gameObject.transform.childCount;
-			for (int i = children - 1; i >= 0; i--)
+			var children = gameObject.transform.childCount;
+			for (var i = children - 1; i >= 0; i--)
 			{
 				var child = gameObject.transform.GetChild(i);
 
@@ -103,40 +77,39 @@ namespace Gameframe.Water2D
 			}
 		}
 
-		public void SpawnWater()
+		private void SpawnWater()
 		{
+			_edgeCount = Mathf.RoundToInt(width) * nodeDensity;
+			var nodeCount = _edgeCount + 1;
 
-			edgeCount = Mathf.RoundToInt(width) * nodeDensity;
-			nodeCount = edgeCount + 1;
+			var meshWidth = width / _edgeCount;
 
-			float meshWidth = width / edgeCount;
-
-			nodes = new Water2DSurfaceNode[nodeCount];
-			meshes = new Water2DMesh[edgeCount];
+			_nodes = new Water2DSurfaceNodeData[nodeCount];
+			_meshes = new Water2DMeshData[_edgeCount];
 
 			//Build Nodes
-			for (int i = 0; i < nodes.Length; i++)
+			for (var i = 0; i < _nodes.Length; i++)
 			{
 
-				var node = new Water2DSurfaceNode();
-				nodes[i] = node;
+				var node = new Water2DSurfaceNodeData();
+				_nodes[i] = node;
 
-				node.yPos = top;
-				node.xPos = left + (width * i) / edgeCount;
+				node.yPos = Top;
+				node.xPos = Left + (width * i) / _edgeCount;
 				node.acceleration = 0;
 				node.velocity = 0;
 
 			}
 
 			//Build Meshes
-			for (int i = 0; i < meshes.Length; i++)
+			for (var i = 0; i < _meshes.Length; i++)
 			{
 
-				var leftNode = nodes[i];
-				var rightNode = nodes[i + 1];
+				var leftNode = _nodes[i];
+				var rightNode = _nodes[i + 1];
 
-				meshes[i] = new Water2DMesh();
-				var edgeMesh = meshes[i];
+				_meshes[i] = new Water2DMeshData();
+				var edgeMesh = _meshes[i];
 
 				//Build Mesh
 				edgeMesh.mesh = new Mesh();
@@ -158,7 +131,7 @@ namespace Gameframe.Water2D
 				uv[2] = new Vector2(0, 0);
 				uv[3] = new Vector3(1, 0);
 
-				int[] triangles = new int[6] {0, 1, 3, 3, 1, 2};
+				int[] triangles = {0, 1, 3, 3, 1, 2};
 
 				edgeMesh.mesh.vertices = verts;
 				edgeMesh.mesh.uv = uv;
@@ -184,9 +157,9 @@ namespace Gameframe.Water2D
 					edgeMesh.collider3D.isTrigger = true; //*/
 
 					var waterCollider = edgeMesh.collider3D.gameObject.AddComponent<Water3DCollider>();
-					waterCollider.waterBody = this;
-					waterCollider.leftNode = i;
-					waterCollider.rightNode = i + 1;
+					waterCollider.WaterBody = this;
+					waterCollider.LeftNode = i;
+					waterCollider.RightNode = i + 1;
 				}
 				else
 				{
@@ -196,9 +169,9 @@ namespace Gameframe.Water2D
 					edgeMesh.collider.isTrigger = true;
 
 					var waterCollider = edgeMesh.collider.gameObject.AddComponent<Water2DCollider>();
-					waterCollider.waterBody = this;
-					waterCollider.leftNode = i;
-					waterCollider.rightNode = i + 1;
+					waterCollider.WaterBody = this;
+					waterCollider.LeftNode = i;
+					waterCollider.RightNode = i + 1;
 				}
 
 			}
@@ -206,19 +179,19 @@ namespace Gameframe.Water2D
 
 		}
 
-		void UpdateMeshes()
+		private void UpdateMeshes()
 		{
-			float meshWidth = width / edgeCount;
+			var meshWidth = width / _edgeCount;
 
-			for (int i = 0; i < meshes.Length; i++)
+			for (var i = 0; i < _meshes.Length; i++)
 			{
 
-				var leftNode = nodes[i];
-				var rightNode = nodes[i + 1];
-				var edgeMesh = meshes[i];
+				var leftNode = _nodes[i];
+				var rightNode = _nodes[i + 1];
+				var edgeMesh = _meshes[i];
 
 				//Build Mesh
-				Vector3[] verts = new Vector3[4];
+				var verts = new Vector3[4];
 				verts[0] = new Vector3(0, leftNode.yPos, zOffset);
 				verts[1] = new Vector3(meshWidth, rightNode.yPos, zOffset);
 				verts[2] = new Vector3(meshWidth, -height, zOffset);
@@ -230,50 +203,49 @@ namespace Gameframe.Water2D
 
 		}
 
-		void UpdateNodes()
+		private void UpdateNodes()
 		{
 
 			//Update node velocity and yPos
-			for (int i = 0; i < nodes.Length; i++)
+			for (var i = 0; i < _nodes.Length; i++)
 			{
 
-				var node = nodes[i];
-				float force = springConstant * (node.yPos - baseHight) + node.velocity * damping;
+				var node = _nodes[i];
+				var force = springConstant * (node.yPos - BaseHeight) + node.velocity * damping;
 				node.acceleration = -force / nodeMass;
 				node.velocity += node.acceleration;
-				node.yPos += node.velocity; // * Time.deltaTime;
-
+				node.yPos += node.velocity;
 			}
 
 		}
 
-		void PropagateWaves()
+		private void PropagateWaves()
 		{
 
-			float[] leftDelta = new float[nodes.Length];
-			float[] rightDelta = new float[nodes.Length];
+			var leftDelta = new float[_nodes.Length];
+			var rightDelta = new float[_nodes.Length];
 
-			int iterations = 2;
+			const int iterations = 2;
 
-			for (int j = 0; j < iterations; j++)
+			for (var j = 0; j < iterations; j++)
 			{
 
 				//Propagate Outward from each node
-				for (int i = 0; i < nodes.Length; i++)
+				for (var i = 0; i < _nodes.Length; i++)
 				{
 
-					Water2DSurfaceNode leftNode = null;
-					Water2DSurfaceNode node = nodes[i];
-					Water2DSurfaceNode rightNode = null;
+					Water2DSurfaceNodeData leftNode = null;
+					Water2DSurfaceNodeData node = _nodes[i];
+					Water2DSurfaceNodeData rightNode = null;
 
-					if (i + 1 < nodes.Length)
+					if (i + 1 < _nodes.Length)
 					{
-						rightNode = nodes[i + 1];
+						rightNode = _nodes[i + 1];
 					}
 
 					if (i - 1 >= 0)
 					{
-						leftNode = nodes[i - 1];
+						leftNode = _nodes[i - 1];
 					}
 
 					//Multiply height difference by a spread factor
@@ -294,19 +266,19 @@ namespace Gameframe.Water2D
 			}
 
 			//Finally Update Positions
-			for (int i = 0; i < nodes.Length; i++)
+			for (var i = 0; i < _nodes.Length; i++)
 			{
 
 				//Left
 				if (i - 1 >= 0)
 				{
-					nodes[i - 1].yPos += leftDelta[i];
+					_nodes[i - 1].yPos += leftDelta[i];
 				}
 
 				//Right
-				if (i + 1 < nodes.Length)
+				if (i + 1 < _nodes.Length)
 				{
-					nodes[i + 1].yPos += rightDelta[i];
+					_nodes[i + 1].yPos += rightDelta[i];
 				}
 
 			}
@@ -315,13 +287,12 @@ namespace Gameframe.Water2D
 
 		public void Collision(Water2DCollider waterCollider, float xPos, float momentum)
 		{
+			var leftNode = _nodes[waterCollider.LeftNode];
+			var rightNode = _nodes[waterCollider.RightNode];
 
-			var leftNode = nodes[waterCollider.leftNode];
-			var rightNode = nodes[waterCollider.rightNode];
+			var velocity = momentum / nodeMass;
 
-			float velocity = momentum / nodeMass;
-
-			float leftWeight = 1f;
+			float leftWeight;
 
 			if (xPos < leftNode.xPos)
 			{
@@ -333,8 +304,8 @@ namespace Gameframe.Water2D
 			}
 			else
 			{
-				float width = rightNode.xPos - leftNode.xPos;
-				leftWeight = (xPos - leftNode.xPos) / width;
+				var localWidth = rightNode.xPos - leftNode.xPos;
+				leftWeight = (xPos - leftNode.xPos) / localWidth;
 			}
 
 			//Spawn Splash Partile
@@ -343,7 +314,7 @@ namespace Gameframe.Water2D
 
 			if (splashFx != null)
 			{
-				float splashX = (rightNode.xPos + leftNode.xPos) * 0.5f;
+				var splashX = (rightNode.xPos + leftNode.xPos) * 0.5f;
 				var pt = transform.TransformPoint(new Vector3(splashX, 0, -5));
 				Instantiate(splashFx, pt, Quaternion.identity);
 			}
@@ -353,12 +324,12 @@ namespace Gameframe.Water2D
 		public void Collision(Water3DCollider waterCollider, float xPos, float momentum)
 		{
 
-			var leftNode = nodes[waterCollider.leftNode];
-			var rightNode = nodes[waterCollider.rightNode];
+			var leftNode = _nodes[waterCollider.LeftNode];
+			var rightNode = _nodes[waterCollider.RightNode];
 
-			float velocity = momentum / nodeMass;
+			var velocity = momentum / nodeMass;
 
-			float leftWeight = 1f;
+			float leftWeight;
 
 			if (xPos < leftNode.xPos)
 			{
@@ -370,43 +341,23 @@ namespace Gameframe.Water2D
 			}
 			else
 			{
-				float width = rightNode.xPos - leftNode.xPos;
-				leftWeight = (xPos - leftNode.xPos) / width;
+				var localWidth = rightNode.xPos - leftNode.xPos;
+				leftWeight = (xPos - leftNode.xPos) / localWidth;
 			}
 
-			//Spawn Splash Partile
+			//Spawn Splash Particle
 			leftNode.velocity += velocity * leftWeight;
 			rightNode.velocity += velocity * (1f - leftWeight);
 
 			if (splashFx != null)
 			{
-				float splashX = (rightNode.xPos + leftNode.xPos) * 0.5f;
+				var splashX = (rightNode.xPos + leftNode.xPos) * 0.5f;
 				var pt = transform.TransformPoint(new Vector3(splashX, 0, 0));
 				Instantiate(splashFx, pt, Quaternion.identity);
 			}
 
 		}
 
-	}
-
-	[System.Serializable]
-	public class Water2DSurfaceNode
-	{
-		public float xPos;
-		public float yPos;
-		public float velocity;
-		public float acceleration;
-	}
-
-	[System.Serializable]
-	public class Water2DMesh
-	{
-		public GameObject gameObject;
-		public MeshRenderer renderer;
-		public MeshFilter filter;
-		public Mesh mesh;
-		public BoxCollider2D collider;
-		public BoxCollider collider3D;
 	}
 
 }

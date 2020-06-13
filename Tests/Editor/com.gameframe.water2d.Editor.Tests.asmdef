@@ -1,1 +1,0 @@
-{ "name": "com.gameframe.water2d.Editor.Tests", "references": [ "com.gameframe.water2d" ], "optionalUnityReferences": ["TestAssemblies"], "includePlatforms": [ "Editor" ], "excludePlatforms": [] }
