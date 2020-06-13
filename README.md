@@ -7,6 +7,9 @@
 ![GitHub](https://img.shields.io/github/license/coryleach/UnitySaveLoad)
 
 [![twitter](https://img.shields.io/twitter/follow/coryleach.svg?style=social)](https://twitter.com/coryleach)
+
+<img src="https://media.giphy.com/media/W36MLDTWKCBuFjvv8P/giphy.gif" />
+
 <!-- BADGE-END -->
 
 > Splashy 2D water
@@ -37,7 +40,7 @@ Changes between 'DOC START' and 'DOC END' will not be modified by readme update 
 
 ## Usage
 
-<a href="https://i.imgur.com/wQbhC0w">Example Video</a>
+Import the package in the demo folder for example usage
 
 <!-- DOC-END -->
 
