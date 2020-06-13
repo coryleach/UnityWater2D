@@ -19,7 +19,7 @@
 #### Using UnityPackageManager (for Unity 2019.3 or later)
 Open the package manager window (menu: Window > Package Manager)<br/>
 Select "Add package from git URL...", fill in the pop-up with the following link:<br/>
-https://github.com/coryleach/UnityWater2D.git#1.0.1<br/>
+https://github.com/coryleach/UnityWater2D.git#2.0.0<br/>
 
 #### Using UnityPackageManager (for Unity 2019.1 or later)
 
@@ -27,7 +27,7 @@ Find the manifest.json file in the Packages folder of your project and edit it t
 ```js
 {
   "dependencies": {
-    "com.gameframe.water2d": "https://github.com/coryleach/UnityWater2D.git#1.0.1",
+    "com.gameframe.water2d": "https://github.com/coryleach/UnityWater2D.git#2.0.0",
     ...
   },
 }
